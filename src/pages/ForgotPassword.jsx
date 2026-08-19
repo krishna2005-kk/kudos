@@ -1,0 +1,6 @@
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { AuthShell } from './Login'
+
+function ForgotPassword() { const [sent, setSent] = useState(false); const [email, setEmail] = useState(''); return <AuthShell eyebrow="Reset access" title="We’ll help you get back in." description="Enter your work email and we’ll simulate a secure password reset link.">{sent ? <div className="rounded-xl border border-emerald-100 bg-emerald-50 p-5"><p className="font-semibold text-slate-950">Reset link sent</p><p className="mt-1 text-sm leading-6 text-slate-600">A simulated reset link was sent to {email}.</p></div> : <form onSubmit={(event) => { event.preventDefault(); setSent(true) }} className="space-y-5"><div><label className="label" htmlFor="forgot-email">Work email</label><input id="forgot-email" type="email" className="field" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@company.com" required /></div><button className="primary-button w-full">Send reset link</button></form>}<p className="mt-7 text-center text-sm text-slate-500"><Link className="font-semibold text-teal-700" to="/login">Back to sign in</Link></p></AuthShell> }
+export default ForgotPassword
