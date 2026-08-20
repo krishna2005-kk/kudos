@@ -1,8 +1,50 @@
-import { useState } from 'react'
-import { Medal } from 'lucide-react'
-import DepartmentFilter from '../components/leaderboard/DepartmentFilter'
-import LeaderboardCard from '../components/leaderboard/LeaderboardCard'
-import { leaderboard } from '../data/mockData'
+import { useState } from "react";
+import DepartmentFilter from "../components/leaderboard/DepartmentFilter";
+import { leaderboard } from "../data/mockData";
 
-function Leaderboard() { const [department, setDepartment] = useState('All departments'); const people = department === 'All departments' ? leaderboard : leaderboard.filter((person) => person.department === department); return <div className="space-y-6"><div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end"><div><p className="eyebrow">Recognition at a glance</p><h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">Monthly leaderboard</h1><p className="mt-2 text-slate-500">Celebrating the people making an impact this month.</p></div><DepartmentFilter value={department} onChange={setDepartment} /></div><div className="grid gap-6 lg:grid-cols-[1fr_300px]"><section className="panel overflow-hidden"><div className="flex items-center justify-between border-b border-slate-100 p-5"><div><h2 className="section-title">August recognition</h2><p className="mt-1 text-xs text-slate-500">Updated from the latest team activity</p></div><Medal className="text-amber-500" /></div>{people.length ? people.map((person) => <LeaderboardCard key={person.id} person={person} />) : <p className="p-8 text-center text-sm text-slate-500">No recognized employees in this department yet.</p>}</section><aside className="panel h-fit p-5"><p className="eyebrow">How it works</p><p className="mt-3 text-sm leading-6 text-slate-600">Rankings are calculated from recognition points earned during the current month.</p><div className="mt-5 border-t border-slate-100 pt-4 text-xs leading-5 text-slate-500">Keep recognizing great work. Every point tells a story.</div></aside></div></div> }
-export default Leaderboard
+function Leaderboard() {
+  const [department, setDepartment] = useState("All departments");
+
+  const filteredPeople = leaderboard.filter((person) => {
+    if (department === "All departments") {
+      return true;
+    }
+
+    return person.department === department;
+  });
+
+  return (
+    <div>
+      <h1>Monthly Leaderboard</h1>
+
+      <div className="card mt-4">
+        <DepartmentFilter value={department} onChange={setDepartment} />
+
+        <div className="table-wrapper">
+          <table className="simple-table">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Department</th>
+                <th>Points</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredPeople.map((person) => (
+                <tr key={person.rank}>
+                  <td>{person.rank}</td>
+                  <td>{person.name}</td>
+                  <td>{person.department}</td>
+                  <td>{person.points}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default Leaderboard;

@@ -1,8 +1,42 @@
-import { Mail, MapPin, Send, Trophy } from 'lucide-react'
 import KudosCard from '../components/kudos/KudosCard'
 import RecognitionBadge from '../components/profile/RecognitionBadge'
 import { badges, currentUser, kudosFeed } from '../data/mockData'
 
-function Profile() { return <div className="space-y-6"><section className="profile-hero"><div className="avatar avatar-profile">{currentUser.avatar}</div><div className="min-w-0"><p className="eyebrow text-teal-100">My profile</p><h1 className="mt-2 text-3xl font-bold text-white">{currentUser.name}</h1><div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm text-teal-50"><span className="inline-flex items-center gap-2"><Mail size={15} />{currentUser.email}</span><span className="inline-flex items-center gap-2"><MapPin size={15} />{currentUser.department}</span></div></div></section><div className="grid gap-4 md:grid-cols-4"><Stat label="Giving allowance" value={`${currentUser.givingAllowance}`} detail="points left" /><Stat label="Earned points" value={currentUser.earnedPoints} detail="all time" /><Stat label="Kudos given" value={currentUser.kudosGiven} detail="recognitions" /><Stat label="Kudos received" value={currentUser.kudosReceived} detail="recognitions" /></div><section><div className="mb-4 flex items-center gap-2"><Trophy size={19} className="text-amber-600" /><h2 className="section-title">Recognition badges</h2></div><div className="grid gap-3 md:grid-cols-3">{badges.map((badge) => <RecognitionBadge key={badge.title} badge={badge} />)}</div></section><section><div className="mb-4 flex items-center gap-2"><Send size={18} className="text-teal-700" /><h2 className="section-title">Recent recognition</h2></div><div className="grid gap-4 xl:grid-cols-2">{kudosFeed.slice(0, 2).map((kudos) => <KudosCard key={kudos.id} kudos={kudos} />)}</div></section></div> }
-function Stat({ label, value, detail }) { return <div className="panel p-4"><p className="text-xs text-slate-500">{label}</p><p className="mt-2 text-2xl font-bold text-slate-950">{value}</p><p className="text-xs text-slate-500">{detail}</p></div> }
+function Profile() {
+  return (
+    <div>
+      <h1>Profile</h1>
+
+      <section className="card mt-4">
+        <p>Name: {currentUser.name}</p>
+        <p>Email: {currentUser.email}</p>
+        <p>Department: {currentUser.department}</p>
+      </section>
+
+      <section className="card mt-4">
+        <p>Giving Points: {currentUser.givingAllowance}</p>
+        <p>Earned Points: {currentUser.earnedPoints}</p>
+        <p>Kudos Given: {currentUser.kudosGiven}</p>
+        <p>Kudos Received: {currentUser.kudosReceived}</p>
+      </section>
+
+      <section className="card mt-4">
+        <h2>Badges</h2>
+        <ul>
+          {badges.map((badge) => (
+            <RecognitionBadge key={badge} badge={badge} />
+          ))}
+        </ul>
+      </section>
+
+      <section className="card mt-4">
+        <h2>Recent Kudos</h2>
+        {kudosFeed.slice(0, 2).map((kudos) => (
+          <KudosCard key={kudos.id} kudos={kudos} />
+        ))}
+      </section>
+    </div>
+  )
+}
+
 export default Profile

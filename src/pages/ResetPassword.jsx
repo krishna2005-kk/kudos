@@ -1,6 +1,77 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import Button from '@visa/nova-react/button'
 import { AuthShell } from './Login'
 
-function ResetPassword() { const [done, setDone] = useState(false); const [error, setError] = useState(''); const [password, setPassword] = useState(''); const [confirm, setConfirm] = useState(''); const submit = (event) => { event.preventDefault(); if (password !== confirm) { setError('Passwords do not match.'); return } setDone(true) }; return <AuthShell eyebrow="Choose a new password" title="A fresh start is close." description="Create a new password for your Kudos account.">{done ? <div className="rounded-xl border border-emerald-100 bg-emerald-50 p-5"><p className="font-semibold text-slate-950">Password updated</p><p className="mt-1 text-sm leading-6 text-slate-600">Your new password has been saved in this demo.</p></div> : <form onSubmit={submit} className="space-y-5"><div><label className="label" htmlFor="new-password">New password</label><input id="new-password" type="password" className="field" value={password} onChange={(event) => setPassword(event.target.value)} minLength="8" required /></div><div><label className="label" htmlFor="reset-confirm">Confirm password</label><input id="reset-confirm" type="password" className="field" value={confirm} onChange={(event) => setConfirm(event.target.value)} required /></div>{error && <p className="text-sm text-rose-600">{error}</p>}<button className="primary-button w-full">Reset password</button></form>}<p className="mt-7 text-center text-sm text-slate-500"><Link className="font-semibold text-teal-700" to="/login">Back to sign in</Link></p></AuthShell> }
+function ResetPassword() {
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [error, setError] = useState('')
+  const [done, setDone] = useState(false)
+
+  function handleSubmit(event) {
+    event.preventDefault()
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.')
+      return
+    }
+
+    setError('')
+    setDone(true)
+  }
+
+  return (
+    <AuthShell title="Reset Password">
+      {done ? (
+        <div className="card">
+          <h3>Password updated</h3>
+          <p>Your new password has been saved in this demo.</p>
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label className="label" htmlFor="new-password">
+              New Password
+            </label>
+            <input
+              className="field"
+              id="new-password"
+              type="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              minLength="8"
+              required
+            />
+          </div>
+
+          <div className="mb-4">
+            <label className="label" htmlFor="confirm-new-password">
+              Confirm Password
+            </label>
+            <input
+              className="field"
+              id="confirm-new-password"
+              type="password"
+              value={confirmPassword}
+              onChange={(event) => setConfirmPassword(event.target.value)}
+              required
+            />
+          </div>
+
+          {error && <p className="danger-text">{error}</p>}
+
+          <Button className="primary-button w-full" type="submit">
+            Reset Password
+          </Button>
+        </form>
+      )}
+
+      <p className="mt-4 text-center">
+        <Link to="/login">Back to Login</Link>
+      </p>
+    </AuthShell>
+  )
+}
+
 export default ResetPassword

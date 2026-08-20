@@ -1,15 +1,41 @@
 import { useState } from 'react'
 
+const reactionEmojis = {
+  Like: '👍',
+  Clap: '👏',
+  Fire: '🔥',
+}
+
 function ReactionButtons({ reactions }) {
-  const [counts, setCounts] = useState(reactions)
-  const [selected, setSelected] = useState('')
-  const toggleReaction = (reaction) => {
-    setCounts((current) => ({ ...current, [reaction]: current[reaction] + (selected === reaction ? -1 : 1) }))
-    setSelected(selected === reaction ? '' : reaction)
+  const [selectedReaction, setSelectedReaction] = useState('')
+
+  function handleReactionClick(reaction) {
+    if (selectedReaction === reaction) {
+      setSelectedReaction('')
+    } else {
+      setSelectedReaction(reaction)
+    }
   }
-  return <div className="flex flex-wrap gap-2">
-    {Object.entries(counts).map(([reaction, count]) => <button key={reaction} type="button" className={`reaction ${selected === reaction ? 'reaction-selected' : ''}`} onClick={() => toggleReaction(reaction)}>{reaction} <span>{count}</span></button>)}
-  </div>
+
+  return (
+    <div className="mt-3 flex flex-wrap gap-2">
+      {Object.keys(reactions).map((reaction) => {
+        const isSelected = selectedReaction === reaction
+        const extraPoint = isSelected ? 1 : 0
+
+        return (
+          <button
+            className={isSelected ? 'reaction reaction-selected' : 'reaction'}
+            key={reaction}
+            type="button"
+            onClick={() => handleReactionClick(reaction)}
+          >
+            {reactionEmojis[reaction]} {reaction} {reactions[reaction] + extraPoint}
+          </button>
+        )
+      })}
+    </div>
+  )
 }
 
 export default ReactionButtons

@@ -1,13 +1,123 @@
 import { useState } from 'react'
-import { CheckCircle2 } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
+import Button from '@visa/nova-react/button'
 import { AuthShell } from './Login'
 
 function Signup() {
-  const navigate = useNavigate(); const [verified, setVerified] = useState(false); const [error, setError] = useState(''); const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '', department: '' })
-  const update = (key, value) => setForm({ ...form, [key]: value })
-  const submit = (event) => { event.preventDefault(); if (form.password !== form.confirm) { setError('Passwords do not match.'); return } setVerified(true) }
-  if (verified) return <AuthShell eyebrow="Almost there" title="Your account is ready to verify." description="We have prepared a verification step for your work email."><div className="rounded-xl border border-emerald-100 bg-emerald-50 p-5"><CheckCircle2 className="text-emerald-700" /><p className="mt-3 font-semibold text-slate-950">Verification email simulated</p><p className="mt-1 text-sm leading-6 text-slate-600">Check your inbox at {form.email}, then continue to your workspace.</p></div><button className="primary-button mt-6 w-full" onClick={() => navigate('/login')}>Continue to sign in</button></AuthShell>
-  return <AuthShell eyebrow="Create your account" title="Bring more appreciation to work." description="Join your team’s private space for meaningful recognition."><form onSubmit={submit} className="grid gap-4 sm:grid-cols-2"><div className="sm:col-span-2"><label className="label" htmlFor="name">Full name</label><input id="name" className="field" value={form.name} onChange={(event) => update('name', event.target.value)} placeholder="Heer Solanki" required /></div><div className="sm:col-span-2"><label className="label" htmlFor="signup-email">Work email</label><input id="signup-email" type="email" className="field" value={form.email} onChange={(event) => update('email', event.target.value)} placeholder="you@company.com" required /></div><div><label className="label" htmlFor="signup-password">Password</label><input id="signup-password" type="password" className="field" value={form.password} onChange={(event) => update('password', event.target.value)} placeholder="8+ characters" minLength="8" required /></div><div><label className="label" htmlFor="confirm-password">Confirm password</label><input id="confirm-password" type="password" className="field" value={form.confirm} onChange={(event) => update('confirm', event.target.value)} placeholder="Repeat password" required /></div><div className="sm:col-span-2"><label className="label" htmlFor="department">Department</label><select id="department" className="field" value={form.department} onChange={(event) => update('department', event.target.value)} required><option value="">Select department</option><option>Engineering</option><option>Design</option><option>Marketing</option><option>Sales</option></select></div>{error && <p className="sm:col-span-2 text-sm text-rose-600">{error}</p>}<button className="primary-button sm:col-span-2" type="submit">Create account</button></form><p className="mt-6 text-center text-sm text-slate-500">Already have an account? <Link className="font-semibold text-teal-700" to="/login">Sign in</Link></p></AuthShell>
+  const navigate = useNavigate()
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [department, setDepartment] = useState('')
+  const [error, setError] = useState('')
+  const [verified, setVerified] = useState(false)
+
+  function handleSignup(event) {
+    event.preventDefault()
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.')
+      return
+    }
+
+    setError('')
+    setVerified(true)
+  }
+
+  if (verified) {
+    return (
+      <AuthShell title="Email Verification">
+        <div className="card">
+          <h3>Verification email simulated</h3>
+          <p>A verification message was sent to {email}.</p>
+        </div>
+
+        <Button className="primary-button mt-4 w-full" type="button" onClick={() => navigate('/login')}>
+          Continue to Login
+        </Button>
+      </AuthShell>
+    )
+  }
+
+  return (
+    <AuthShell title="Sign Up">
+      <form onSubmit={handleSignup}>
+        <div className="mb-4">
+          <label className="label" htmlFor="name">
+            Full Name
+          </label>
+          <input className="field" id="name" value={name} onChange={(event) => setName(event.target.value)} required />
+        </div>
+
+        <div className="mb-4">
+          <label className="label" htmlFor="signup-email">
+            Email
+          </label>
+          <input
+            className="field"
+            id="signup-email"
+            type="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            required
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="label" htmlFor="department">
+            Department
+          </label>
+          <select className="field" id="department" value={department} onChange={(event) => setDepartment(event.target.value)} required>
+            <option value="">Select Department</option>
+            <option>Engineering</option>
+            <option>Design</option>
+            <option>Marketing</option>
+            <option>Sales</option>
+          </select>
+        </div>
+
+        <div className="mb-4">
+          <label className="label" htmlFor="signup-password">
+            Password
+          </label>
+          <input
+            className="field"
+            id="signup-password"
+            type="password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            minLength="8"
+            required
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="label" htmlFor="confirm-password">
+            Confirm Password
+          </label>
+          <input
+            className="field"
+            id="confirm-password"
+            type="password"
+            value={confirmPassword}
+            onChange={(event) => setConfirmPassword(event.target.value)}
+            required
+          />
+        </div>
+
+        {error && <p className="danger-text">{error}</p>}
+
+        <Button className="primary-button w-full" type="submit">
+          Create Account
+        </Button>
+      </form>
+
+      <p className="mt-4 text-center">
+        Already have an account? <Link to="/login">Login</Link>
+      </p>
+    </AuthShell>
+  )
 }
+
 export default Signup
