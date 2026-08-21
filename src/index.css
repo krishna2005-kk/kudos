@@ -211,6 +211,42 @@ a:hover {
   overflow-x: auto;
 }
 
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.profile-avatar {
+  width: 76px;
+  height: 76px;
+  border: 1px solid #99d6ce;
+  border-radius: 50%;
+  background: #e6fffb;
+  color: #0f766e;
+  font-size: 28px;
+  font-weight: 700;
+  object-fit: cover;
+}
+
+.badge-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.badge-list li {
+  border: 1px solid #99d6ce;
+  border-radius: 999px;
+  background: #e6fffb;
+  padding: 6px 10px;
+  color: #0f766e;
+  font-weight: 600;
+}
+
 .simple-table {
   width: 100%;
   border-collapse: collapse;

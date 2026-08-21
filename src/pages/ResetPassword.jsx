@@ -1,15 +1,19 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import Button from '@visa/nova-react/button'
 import { AuthShell } from './Login'
+import api, { getApiError } from '../lib/api'
+import { useAuth } from '../context/AuthContext'
 
 function ResetPassword() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
   const [done, setDone] = useState(false)
+  const [searchParams] = useSearchParams()
+  const { setUser } = useAuth()
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault()
 
     if (password !== confirmPassword) {
@@ -17,8 +21,20 @@ function ResetPassword() {
       return
     }
 
-    setError('')
-    setDone(true)
+    const token = searchParams.get('token')
+    if (!token) {
+      setError('The reset link is missing its token.')
+      return
+    }
+    try {
+      const response = await api.post('/auth/reset-password', { token, password, confirmPassword })
+      localStorage.setItem('kudos_access_token', response.data.data.accessToken)
+      setUser(response.data.data.user)
+      setError('')
+      setDone(true)
+    } catch (requestError) {
+      setError(getApiError(requestError))
+    }
   }
 
   return (

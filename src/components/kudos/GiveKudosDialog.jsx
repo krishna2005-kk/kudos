@@ -1,21 +1,44 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Button from '@visa/nova-react/button'
-import { employees } from '../../data/mockData'
+import api, { getApiError } from '../../lib/api'
+import { useAuth } from '../../context/AuthContext'
 
-function GiveKudosDialog({ open, onClose }) {
+function GiveKudosDialog({ open, onClose, onSent }) {
   const [employeeId, setEmployeeId] = useState('')
   const [points, setPoints] = useState('20')
   const [message, setMessage] = useState('')
   const [companyValue, setCompanyValue] = useState('#Teamwork')
   const [sent, setSent] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [employees, setEmployees] = useState([])
+  const [error, setError] = useState('')
+  const { user } = useAuth()
+
+  useEffect(() => {
+    if (!open) return
+    setError('')
+    api.get('/users', { params: { limit: 50 } })
+      .then((response) => setEmployees(response.data.data.users))
+      .catch((requestError) => setError(getApiError(requestError)))
+  }, [open])
 
   if (!open) {
     return null
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault()
-    setSent(true)
+    setSubmitting(true)
+    try {
+      const response = await api.post('/kudos', { receiverId: employeeId, points: Number(points), message, companyValue })
+      setError('')
+      setSent(true)
+      await onSent?.(response.data.data.kudos)
+    } catch (requestError) {
+      setError(getApiError(requestError))
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   function closeDialog() {
@@ -48,9 +71,9 @@ function GiveKudosDialog({ open, onClose }) {
               <select className="field" id="employee" value={employeeId} onChange={(event) => setEmployeeId(event.target.value)} required>
                 <option value="">Select Employee</option>
                 {employees
-                  .filter((employee) => employee.id !== '1')
+                  .filter((employee) => employee.role === 'employee' && employee._id !== user?.id)
                   .map((employee) => (
-                    <option key={employee.id} value={employee.id}>
+                    <option key={employee._id} value={employee._id}>
                       {employee.name} - {employee.department}
                     </option>
                   ))}
@@ -89,18 +112,19 @@ function GiveKudosDialog({ open, onClose }) {
               <select className="field" id="company-value" value={companyValue} onChange={(event) => setCompanyValue(event.target.value)}>
                 <option>#Teamwork</option>
                 <option>#Innovation</option>
-                <option>#CustomerFocus</option>
+                <option>#CustomerObsession</option>
               </select>
             </div>
 
             <div className="flex gap-3">
-              <Button className="primary-button" type="submit">
-                Send Kudos
+              <Button className="primary-button" type="submit" disabled={submitting}>
+                {submitting ? 'Sending…' : 'Send Kudos'}
               </Button>
               <Button className="secondary-button" type="button" onClick={closeDialog}>
                 Cancel
               </Button>
             </div>
+            {error && <p className="danger-text">{error}</p>}
           </form>
         )}
       </div>

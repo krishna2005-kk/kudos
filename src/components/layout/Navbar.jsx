@@ -1,10 +1,13 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import Button from '@visa/nova-react/button'
+import { useAuth } from '../../context/AuthContext'
 
 function Navbar() {
   const navigate = useNavigate()
+  const { logout, user } = useAuth()
 
-  function logout() {
+  async function handleLogout() {
+    await logout()
     navigate('/login')
   }
 
@@ -23,9 +26,10 @@ function Navbar() {
           <NavLink className={getLinkClass} to="/profile">
             Profile
           </NavLink>
+          {user?.role === 'admin' && <NavLink className={getLinkClass} to="/admin">Admin</NavLink>}
         </nav>
 
-        <Button className="secondary-button" type="button" onClick={logout}>
+        <Button className="secondary-button" type="button" onClick={handleLogout}>
           Logout
         </Button>
       </div>

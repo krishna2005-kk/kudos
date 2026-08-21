@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Button from '@visa/nova-react/button'
 import { AuthShell } from './Login'
+import { useAuth } from '../context/AuthContext'
+import { getApiError } from '../lib/api'
 
 function Signup() {
   const navigate = useNavigate()
@@ -11,9 +13,9 @@ function Signup() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [department, setDepartment] = useState('')
   const [error, setError] = useState('')
-  const [verified, setVerified] = useState(false)
+  const { signup } = useAuth()
 
-  function handleSignup(event) {
+  async function handleSignup(event) {
     event.preventDefault()
 
     if (password !== confirmPassword) {
@@ -21,23 +23,13 @@ function Signup() {
       return
     }
 
-    setError('')
-    setVerified(true)
-  }
-
-  if (verified) {
-    return (
-      <AuthShell title="Email Verification">
-        <div className="card">
-          <h3>Verification email simulated</h3>
-          <p>A verification message was sent to {email}.</p>
-        </div>
-
-        <Button className="primary-button mt-4 w-full" type="button" onClick={() => navigate('/login')}>
-          Continue to Login
-        </Button>
-      </AuthShell>
-    )
+    try {
+      setError('')
+      await signup({ name, email, password, confirmPassword, department })
+      navigate('/dashboard')
+    } catch (requestError) {
+      setError(getApiError(requestError))
+    }
   }
 
   return (
