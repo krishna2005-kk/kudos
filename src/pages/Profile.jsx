@@ -5,19 +5,35 @@ import { badges, currentUser, kudosFeed } from '../data/mockData'
 function Profile() {
   return (
     <div>
-      <h1>Profile</h1>
+      <div className="page-heading">
+        <h1>Profile</h1>
+        <p>Your recognition summary.</p>
+      </div>
 
-      <section className="card mt-4">
-        <p>Name: {currentUser.name}</p>
-        <p>Email: {currentUser.email}</p>
-        <p>Department: {currentUser.department}</p>
+      <section className="card mt-4 profile-card">
+        <div className="profile-avatar">HS</div>
+        <h2>{currentUser.name}</h2>
+        <p>{currentUser.department}</p>
+        <p>{currentUser.email}</p>
       </section>
 
-      <section className="card mt-4">
-        <p>Giving Points: {currentUser.givingAllowance}</p>
-        <p>Earned Points: {currentUser.earnedPoints}</p>
-        <p>Kudos Given: {currentUser.kudosGiven}</p>
-        <p>Kudos Received: {currentUser.kudosReceived}</p>
+      <section className="simple-grid mt-4">
+        <div className="card">
+          <h3>Giving Allowance</h3>
+          <p>{currentUser.givingAllowance} / {currentUser.allowanceTotal}</p>
+        </div>
+        <div className="card">
+          <h3>Earned Points</h3>
+          <p>{currentUser.earnedPoints}</p>
+        </div>
+        <div className="card">
+          <h3>Kudos Given</h3>
+          <p>{currentUser.kudosGiven}</p>
+        </div>
+        <div className="card">
+          <h3>Kudos Received</h3>
+          <p>{currentUser.kudosReceived}</p>
+        </div>
       </section>
 
       <section className="card mt-4">

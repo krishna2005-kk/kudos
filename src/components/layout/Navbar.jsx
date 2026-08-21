@@ -17,6 +17,12 @@ function Navbar() {
           <NavLink className={getLinkClass} to="/dashboard">
             Dashboard
           </NavLink>
+          <NavLink className={getLinkClass} to="/give-kudos">
+            Give Kudos
+          </NavLink>
+          <NavLink className={getLinkClass} to="/point-history">
+            Point History
+          </NavLink>
           <NavLink className={getLinkClass} to="/leaderboard">
             Leaderboard
           </NavLink>

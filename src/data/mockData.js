@@ -6,6 +6,8 @@ export const currentUser = {
   givingAllowance: 70,
   allowanceTotal: 100,
   earnedPoints: 120,
+  pointsGiven: 30,
+  pointsReceived: 120,
   kudosGiven: 5,
   kudosReceived: 8,
 }
@@ -24,7 +26,7 @@ export const kudosFeed = [
     sender: 'Heer',
     receiver: 'Rahul',
     points: 20,
-    message: 'Great work!',
+    message: 'Great work on the project!',
     value: '#Teamwork',
     reactions: { Like: 5, Clap: 3, Fire: 2 },
   },
@@ -56,4 +58,39 @@ export const leaderboard = [
   { rank: 5, name: 'Anika Desai', department: 'Sales', points: 245 },
 ]
 
-export const badges = ['Team Player', 'Innovator', 'Top Recognized']
+export const pointHistory = [
+  {
+    id: 1,
+    date: '20 Aug 2026',
+    description: 'Gave 20 points to Rahul',
+    type: 'debit',
+    points: 20,
+    balance: 'Remaining balance: 70',
+  },
+  {
+    id: 2,
+    date: '19 Aug 2026',
+    description: 'Received 50 points from Priya',
+    type: 'credit',
+    points: 50,
+    balance: 'Earned points: 120',
+  },
+  {
+    id: 3,
+    date: '18 Aug 2026',
+    description: 'Gave 10 points to Jay',
+    type: 'debit',
+    points: 10,
+    balance: 'Remaining balance: 90',
+  },
+  {
+    id: 4,
+    date: '15 Aug 2026',
+    description: 'Received 20 points from Rahul',
+    type: 'credit',
+    points: 20,
+    balance: 'Earned points: 70',
+  },
+]
+
+export const badges = ['Trophy Team Player', 'Idea Innovator', 'Star Helpful Teammate']

@@ -13,7 +13,7 @@
 body {
   margin: 0;
   min-width: 320px;
-  background: #f5f5f5;
+  background: #f3f7f6;
 }
 
 button,
@@ -41,17 +41,26 @@ a:hover {
 }
 
 .page {
-  max-width: 1000px;
+  max-width: 1080px;
   margin: 0 auto;
   padding: 24px;
 }
 
 .card {
   background: white;
-  border: 1px solid #dddddd;
-  border-radius: 6px;
+  border: 1px solid #dbe5e3;
+  border-radius: 10px;
   padding: 20px;
-  box-shadow: 0 1px 3px rgb(0 0 0 / 8%);
+  box-shadow: 0 4px 12px rgb(15 118 110 / 8%);
+}
+
+.card h3,
+.card h2 {
+  margin-top: 0;
+}
+
+.card p {
+  line-height: 1.6;
 }
 
 .simple-grid {
@@ -111,7 +120,7 @@ a:hover {
 
 .top-nav {
   background: white;
-  border-bottom: 1px solid #dddddd;
+  border-bottom: 1px solid #dbe5e3;
 }
 
 .top-nav-inner {
@@ -127,7 +136,7 @@ a:hover {
 .nav-links {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 14px;
 }
 
 .nav-link {
@@ -160,9 +169,31 @@ a:hover {
 }
 
 .kudos-item {
-  border-top: 1px solid #eeeeee;
-  padding-top: 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 16px;
   margin-top: 14px;
+  background: #fbfefd;
+}
+
+.kudos-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.kudos-message {
+  margin: 12px 0;
+}
+
+.points-badge {
+  border-radius: 999px;
+  background: #ecfdf5;
+  padding: 5px 10px;
+  color: #047857;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .tag {
@@ -184,6 +215,89 @@ a:hover {
 .reaction-selected {
   border-color: #0f766e;
   background: #e6fffb;
+}
+
+.welcome-card {
+  border-radius: 12px;
+  background: white;
+  border: 1px solid #dbe5e3;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgb(15 118 110 / 8%);
+}
+
+.small-title {
+  color: #0f766e;
+  font-weight: 700;
+  margin: 0;
+}
+
+.reset-text,
+.help-text,
+.empty-text {
+  color: #64748b;
+}
+
+.summary-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 8px 18px;
+}
+
+.page-heading p {
+  color: #64748b;
+}
+
+.filter-row,
+.point-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.filter-button,
+.point-option {
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: white;
+  padding: 8px 12px;
+  color: #334155;
+}
+
+.active-filter,
+.selected-point {
+  border-color: #0f766e;
+  background: #e6fffb;
+  color: #0f766e;
+  font-weight: 700;
+}
+
+.credit-text,
+.status-credit {
+  color: #047857;
+  font-weight: 700;
+}
+
+.debit-text,
+.status-debit {
+  color: #b91c1c;
+  font-weight: 700;
+}
+
+.profile-card {
+  text-align: center;
+}
+
+.profile-avatar {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 12px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #ccfbf1;
+  color: #115e59;
+  font-size: 24px;
+  font-weight: 800;
 }
 
 .dialog-backdrop {

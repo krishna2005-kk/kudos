@@ -8,6 +8,7 @@ function GiveKudosDialog({ open, onClose }) {
   const [message, setMessage] = useState('')
   const [companyValue, setCompanyValue] = useState('#Teamwork')
   const [sent, setSent] = useState(false)
+  const pointOptions = ['10', '20', '50']
 
   if (!open) {
     return null
@@ -58,14 +59,19 @@ function GiveKudosDialog({ open, onClose }) {
             </div>
 
             <div className="mb-4">
-              <label className="label" htmlFor="points">
-                Points
-              </label>
-              <select className="field" id="points" value={points} onChange={(event) => setPoints(event.target.value)}>
-                <option value="10">10 points</option>
-                <option value="20">20 points</option>
-                <option value="50">50 points</option>
-              </select>
+              <p className="label">Points</p>
+              <div className="point-options">
+                {pointOptions.map((option) => (
+                  <button
+                    className={points === option ? 'point-option selected-point' : 'point-option'}
+                    key={option}
+                    type="button"
+                    onClick={() => setPoints(option)}
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="mb-4">
@@ -78,6 +84,7 @@ function GiveKudosDialog({ open, onClose }) {
                 rows="4"
                 value={message}
                 onChange={(event) => setMessage(event.target.value)}
+                placeholder="Write your message"
                 required
               />
             </div>
@@ -88,8 +95,8 @@ function GiveKudosDialog({ open, onClose }) {
               </label>
               <select className="field" id="company-value" value={companyValue} onChange={(event) => setCompanyValue(event.target.value)}>
                 <option>#Teamwork</option>
-                <option>#Innovation</option>
                 <option>#CustomerFocus</option>
+                <option>#Innovation</option>
               </select>
             </div>
 
