@@ -1,10 +1,11 @@
-import { kudosFeed } from '../data/mockData'
+import api from "../lib/api";
 
-// TODO: Replace mock kudos data with backend kudos API calls later.
-export async function getKudosFeed() {
-  return kudosFeed
+export async function getKudosFeed(params) {
+  const response = await api.get("/kudos", { params });
+  return response.data.data;
 }
 
-export async function sendKudos() {
-  return { success: true }
+export async function sendKudos(values) {
+  const response = await api.post("/kudos", values);
+  return response.data.data;
 }

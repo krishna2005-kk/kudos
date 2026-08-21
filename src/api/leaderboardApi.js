@@ -1,6 +1,6 @@
-import { leaderboard } from '../data/mockData'
+import api from "../lib/api";
 
-// TODO: Replace mock leaderboard data with backend leaderboard API later.
-export async function getLeaderboard() {
-  return leaderboard
+export async function getLeaderboard(params) {
+  const response = await api.get("/leaderboard", { params });
+  return response.data.data;
 }

@@ -1,6 +1,6 @@
-import { currentUser } from '../data/mockData'
+import api from "../lib/api";
 
-// TODO: Replace mock user data with the backend user profile API later.
 export async function getCurrentUser() {
-  return currentUser
+  const response = await api.get("/users/me");
+  return response.data.data.user;
 }
