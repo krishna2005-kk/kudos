@@ -1,16 +1,113 @@
-# React + Vite
+# Kudos Frontend + Backend Setup
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+This project now contains both parts of the Kudos application.
 
-Currently, two official plugins are available:
+- Frontend: React + Vite at the project root
+- Backend: Node.js + Express + MongoDB inside `backend/`
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Frontend Setup
 
-## React Compiler
+Install frontend packages:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+npm install
+```
 
-## Expanding the Oxlint configuration
+Run frontend:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+```bash
+npm run dev
+```
+
+Frontend runs at:
+
+```text
+http://localhost:5173
+```
+
+Frontend `.env`:
+
+```env
+VITE_API_BASE_URL=http://localhost:5000/api/v1
+VITE_GOOGLE_CLIENT_ID=your_google_oauth_web_client_id.apps.googleusercontent.com
+```
+
+## Backend Setup
+
+Install backend packages:
+
+```bash
+npm run install:backend
+```
+
+Run backend:
+
+```bash
+npm run dev:backend
+```
+
+Backend runs at:
+
+```text
+http://localhost:5000
+```
+
+Backend `.env` is inside:
+
+```text
+backend/.env
+```
+
+Use `backend/.env.example` as the template.
+
+## MongoDB
+
+The backend needs MongoDB running locally:
+
+```text
+mongodb://127.0.0.1:27017/kudos
+```
+
+For backend tests, MongoDB must also be available for:
+
+```text
+mongodb://127.0.0.1:27017/kudos_test
+```
+
+## Useful Commands
+
+Frontend build:
+
+```bash
+npm run build
+```
+
+Frontend lint:
+
+```bash
+npm run lint
+```
+
+Backend tests:
+
+```bash
+npm --prefix backend test
+```
+
+Seed backend data:
+
+```bash
+npm run seed:backend
+```
+
+## Important
+
+Do not commit `.env` files.
+
+The frontend sends API requests to the backend using:
+
+```text
+VITE_API_BASE_URL=http://localhost:5000/api/v1
+```
+
+The backend uses httpOnly cookies for auth when connected.
