@@ -1,47 +1,46 @@
-import { useEffect, useState } from 'react'
-import Button from '@visa/nova-react/button'
-import GiveKudosDialog from '../components/kudos/GiveKudosDialog'
-import KudosCard from '../components/kudos/KudosCard'
-import { currentUser, kudosFeed } from '../data/mockData'
-import { useAuth } from '../context/useAuth'
-import api, { getApiError } from '../lib/api'
+import { useEffect, useState } from "react";
+import Button from "@visa/nova-react/button";
+import GiveKudosDialog from "../components/kudos/GiveKudosDialog";
+import KudosCard from "../components/kudos/KudosCard";
+import { useAuth } from "../context/useAuth";
+import api, { getApiError } from "../lib/api";
 
 function Dashboard() {
-  const [showForm, setShowForm] = useState(false)
-  const [feed, setFeed] = useState(kudosFeed)
-  const [error, setError] = useState('')
-  const { user, refreshUser } = useAuth()
-  const displayUser = user || currentUser
-  const nextResetDate = getNextResetDate()
+  const [showForm, setShowForm] = useState(false);
+  const [feed, setFeed] = useState([]);
+  const [error, setError] = useState("");
+  const { user, refreshUser } = useAuth();
+  const receivedKudos = feed.filter(
+    (kudos) => (kudos.receiver?._id || kudos.receiver?.id) === user?.id,
+  ).length;
+  const displayUser = user || {};
+  const nextResetDate = getNextResetDate();
 
   async function loadFeed() {
     try {
-      const response = await api.get('/kudos')
-      setFeed(response.data.data.kudos)
-      setError('')
+      const response = await api.get("/kudos", { params: { limit: 50 } });
+      setFeed(response.data.data.kudos);
+      setError("");
     } catch (requestError) {
-      setFeed(kudosFeed)
-
-      if (requestError.message !== 'Backend API is not connected yet.') {
-        setError(getApiError(requestError))
-      }
+      setFeed([]);
+      setError(getApiError(requestError));
     }
   }
 
   useEffect(() => {
-    loadFeed()
-  }, [])
+    loadFeed();
+  }, []);
 
   async function handleKudosSent() {
-    await loadFeed()
-    await refreshUser?.()
+    await loadFeed();
+    await refreshUser?.();
   }
 
   return (
     <div>
       <section className="welcome-card">
         <p className="small-title">Kudos Dashboard</p>
-        <h1>Welcome back, {displayUser.name || 'Heer'}</h1>
+        <h1>Welcome back, {displayUser.name || "Heer"}</h1>
         <p>Recognize your teammates and appreciate their work.</p>
         <p className="reset-text">Next points reset: {nextResetDate}</p>
       </section>
@@ -49,7 +48,10 @@ function Dashboard() {
       <div className="simple-grid mt-4">
         <div className="card">
           <h3>Giving Allowance</h3>
-          <p>{displayUser.givingAllowance ?? 70} / {displayUser.allowanceTotal ?? 100}</p>
+          <p>
+            {displayUser.givingAllowance ?? 70} /{" "}
+            {displayUser.allowanceTotal ?? 100}
+          </p>
           <small>Points left this month</small>
         </div>
 
@@ -61,14 +63,18 @@ function Dashboard() {
 
         <div className="card">
           <h3>Kudos Received</h3>
-          <p>{displayUser.kudosReceived ?? 0}</p>
+          <p>{receivedKudos}</p>
           <small>This month</small>
         </div>
       </div>
 
-      {displayUser.role !== 'admin' && (
+      {displayUser.role !== "admin" && (
         <div className="mt-5">
-          <Button className="primary-button" type="button" onClick={() => setShowForm(true)}>
+          <Button
+            className="primary-button"
+            type="button"
+            onClick={() => setShowForm(true)}
+          >
             Give Kudos
           </Button>
         </div>
@@ -77,12 +83,22 @@ function Dashboard() {
       <section className="card mt-5">
         <h2>My Points</h2>
         <div className="summary-list">
-          <p><strong>Giving Allowance:</strong> {displayUser.givingAllowance ?? 70} / {displayUser.allowanceTotal ?? 100}</p>
-          <p><strong>Earned Points:</strong> {displayUser.earnedPoints ?? 0}</p>
-          <p><strong>Points Given:</strong> {displayUser.pointsGiven ?? 30}</p>
-          <p><strong>Points Received:</strong> {displayUser.pointsReceived ?? displayUser.earnedPoints ?? 0}</p>
+          <p>
+            <strong>Giving Allowance:</strong>{" "}
+            {displayUser.givingAllowance ?? 70} /{" "}
+            {displayUser.allowanceTotal ?? 100}
+          </p>
+          <p>
+            <strong>Earned Points:</strong> {displayUser.earnedPoints ?? 0}
+          </p>
+          <p>
+            <strong>Kudos Received:</strong> {receivedKudos}
+          </p>
         </div>
-        <p className="help-text">Giving points are points you can give to others. Earned points are points you have received.</p>
+        <p className="help-text">
+          Giving points are points you can give to others. Earned points are
+          points you have received.
+        </p>
       </section>
 
       <section className="card mt-5">
@@ -95,21 +111,25 @@ function Dashboard() {
         ))}
       </section>
 
-      <GiveKudosDialog open={showForm} onClose={() => setShowForm(false)} onSent={handleKudosSent} />
+      <GiveKudosDialog
+        open={showForm}
+        onClose={() => setShowForm(false)}
+        onSent={handleKudosSent}
+      />
     </div>
-  )
+  );
 }
 
 function getNextResetDate() {
-  const today = new Date()
-  const nextMonth = today.getMonth() + 1
-  const nextReset = new Date(today.getFullYear(), nextMonth, 1)
+  const today = new Date();
+  const nextMonth = today.getMonth() + 1;
+  const nextReset = new Date(today.getFullYear(), nextMonth, 1);
 
-  return nextReset.toLocaleDateString('en-IN', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })
+  return nextReset.toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 }
 
-export default Dashboard
+export default Dashboard;

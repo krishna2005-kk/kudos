@@ -1,35 +1,44 @@
-import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom'
-import DashboardLayout from './layouts/DashboardLayout'
-import Dashboard from './pages/Dashboard'
-import ForgotPassword from './pages/ForgotPassword'
-import GiveKudos from './pages/GiveKudos'
-import Leaderboard from './pages/Leaderboard'
-import Login from './pages/Login'
-import PointHistory from './pages/PointHistory'
-import Profile from './pages/Profile'
-import ResetPassword from './pages/ResetPassword'
-import Signup from './pages/Signup'
-import Admin from './pages/Admin'
-import { useAuth } from './context/useAuth'
+import {
+  BrowserRouter,
+  Navigate,
+  Outlet,
+  Route,
+  Routes,
+} from "react-router-dom";
+import DashboardLayout from "./layouts/DashboardLayout";
+import Dashboard from "./pages/Dashboard";
+import ForgotPassword from "./pages/ForgotPassword";
+import GiveKudos from "./pages/GiveKudos";
+import Leaderboard from "./pages/Leaderboard";
+import Login from "./pages/Login";
+import Profile from "./pages/Profile";
+import ResetPassword from "./pages/ResetPassword";
+import Signup from "./pages/Signup";
+import Admin from "./pages/Admin";
+import { useAuth } from "./context/useAuth";
 
 function ProtectedRoute() {
-  const { user, loading } = useAuth()
+  const { user, loading } = useAuth();
 
   if (loading) {
-    return <main className="page">Loading...</main>
+    return <main className="page">Loading...</main>;
   }
 
-  return user ? <Outlet /> : <Navigate to="/login" replace />
+  return user ? <Outlet /> : <Navigate to="/login" replace />;
 }
 
 function AdminRoute() {
-  const { user, loading } = useAuth()
+  const { user, loading } = useAuth();
 
   if (loading) {
-    return <main className="page">Loading...</main>
+    return <main className="page">Loading...</main>;
   }
 
-  return user?.role === 'admin' ? <Outlet /> : <Navigate to="/dashboard" replace />
+  return user?.role === "admin" ? (
+    <Outlet />
+  ) : (
+    <Navigate to="/dashboard" replace />
+  );
 }
 
 function App() {
@@ -45,7 +54,6 @@ function App() {
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/give-kudos" element={<GiveKudos />} />
-            <Route path="/point-history" element={<PointHistory />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route element={<AdminRoute />}>
@@ -56,7 +64,7 @@ function App() {
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
-  )
+  );
 }
 
-export default App
+export default App;
