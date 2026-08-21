@@ -57,9 +57,3 @@ export const leaderboard = [
   { rank: 4, name: "Jay Patel", department: "Marketing", points: 280 },
   { rank: 5, name: "Anika Desai", department: "Sales", points: 245 },
 ];
-
-export const badges = [
-  "Trophy Team Player",
-  "Idea Innovator",
-  "Star Helpful Teammate",
-];
