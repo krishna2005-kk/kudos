@@ -2,14 +2,24 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import Button from '@visa/nova-react/button'
 import { AuthShell } from './Login'
+import api, { getApiError } from '../lib/api'
 
 function ForgotPassword() {
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
+  const [error, setError] = useState('')
+  const [resetToken, setResetToken] = useState('')
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault()
-    setSent(true)
+    try {
+      const response = await api.post('/auth/forgot-password', { email })
+      setResetToken(response.data.data?.resetToken || '')
+      setError('')
+      setSent(true)
+    } catch (requestError) {
+      setError(getApiError(requestError))
+    }
   }
 
   return (
@@ -17,7 +27,8 @@ function ForgotPassword() {
       {sent ? (
         <div className="card">
           <h3>Reset link sent</h3>
-          <p>A simulated reset link was sent to {email}.</p>
+          <p>Reset instructions were requested for {email}.</p>
+          {resetToken && <p className="mt-3"><Link to={`/reset-password?token=${resetToken}`}>Reset your password</Link> (development only)</p>}
         </div>
       ) : (
         <form onSubmit={handleSubmit}>
@@ -38,6 +49,7 @@ function ForgotPassword() {
           <Button className="primary-button w-full" type="submit">
             Send Reset Link
           </Button>
+          {error && <p className="danger-text">{error}</p>}
         </form>
       )}
 

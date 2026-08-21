@@ -1,17 +1,21 @@
 import ReactionButtons from './ReactionButtons'
 
 function KudosCard({ kudos }) {
+  const senderName = kudos.sender?.name || kudos.sender
+  const receiverName = kudos.receiver?.name || kudos.receiver
+  const companyValue = kudos.companyValue || kudos.value
+
   return (
     <div className="kudos-item">
       <div className="kudos-card-top">
         <p>
-          <strong>{kudos.sender}</strong> to <strong>{kudos.receiver}</strong>
+          <strong>{senderName}</strong> to <strong>{receiverName}</strong>
         </p>
         <span className="points-badge">Star {kudos.points} points</span>
       </div>
       <p className="kudos-message">{kudos.message}</p>
-      <span className="tag">{kudos.value}</span>
-      <ReactionButtons reactions={kudos.reactions} />
+      <span className="tag">{companyValue}</span>
+      <ReactionButtons kudos={kudos} />
     </div>
   )
 }

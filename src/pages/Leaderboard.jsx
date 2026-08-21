@@ -1,17 +1,18 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DepartmentFilter from "../components/leaderboard/DepartmentFilter";
-import { leaderboard } from "../data/mockData";
+import api, { getApiError } from '../lib/api'
 
 function Leaderboard() {
   const [department, setDepartment] = useState("All departments");
+  const [people, setPeople] = useState([])
+  const [error, setError] = useState('')
 
-  const filteredPeople = leaderboard.filter((person) => {
-    if (department === "All departments") {
-      return true;
-    }
-
-    return person.department === department;
-  });
+  useEffect(() => {
+    const params = department === 'All departments' ? {} : { department }
+    api.get('/leaderboard', { params })
+      .then((response) => { setPeople(response.data.data.entries); setError('') })
+      .catch((requestError) => setError(getApiError(requestError)))
+  }, [department])
 
   return (
     <div>
@@ -22,6 +23,7 @@ function Leaderboard() {
 
       <div className="card mt-4">
         <DepartmentFilter value={department} onChange={setDepartment} />
+        {error && <p className="danger-text">{error}</p>}
 
         {filteredPeople.length === 0 ? (
           <p className="empty-text">No employees found for this department.</p>
@@ -37,12 +39,12 @@ function Leaderboard() {
               </tr>
             </thead>
             <tbody>
-              {filteredPeople.map((person) => (
+              {people.map((person) => (
                 <tr key={person.rank}>
                   <td>{person.rank}</td>
-                  <td>{person.name}</td>
-                  <td>{person.department}</td>
-                  <td>{person.points}</td>
+                  <td>{person.user.name}</td>
+                  <td>{person.user.department}</td>
+                  <td>{person.receivedPoints}</td>
                 </tr>
               ))}
             </tbody>

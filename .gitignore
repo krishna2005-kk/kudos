@@ -14,7 +14,7 @@ dist-ssr
 .env
 .env.*
 !.env.example
-kudos/
+/kudos/
 
 # Editor directories and files
 .vscode/*

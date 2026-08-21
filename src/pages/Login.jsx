@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { GoogleLogin } from '@react-oauth/google'
 import { Link, useNavigate } from 'react-router-dom'
 import Button from '@visa/nova-react/button'
+import { useAuth } from '../context/useAuth'
+import { getApiError } from '../lib/api'
 
 function Login() 
 {
@@ -9,10 +11,10 @@ function Login()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const [googleCredential, setGoogleCredential] = useState('')
   const [googleMessage, setGoogleMessage] = useState('')
+  const { login, loginWithGoogle } = useAuth()
 
-  function handleLogin(event) 
+  async function handleLogin(event)
   {
     event.preventDefault()
 
@@ -22,20 +24,26 @@ function Login()
       return
     }
 
-    setError('')
-    navigate('/dashboard')
+    try {
+      setError('')
+      await login({ email, password })
+      navigate('/dashboard')
+    } catch (requestError) {
+      setError(getApiError(requestError))
+    }
   }
 
-  function handleGoogleSuccess(response) 
-  {
-
-    setGoogleCredential(response.credential)
-    setGoogleMessage('Google authorization successful.')
-    console.log('Google authorization result:', response)
+  async function handleGoogleSuccess(response) {
+    try {
+      await loginWithGoogle(response.credential)
+      setGoogleMessage('')
+      navigate('/dashboard')
+    } catch (requestError) {
+      setGoogleMessage(getApiError(requestError))
+    }
   }
 
   function handleGoogleError() {
-    setGoogleCredential('')
     setGoogleMessage('Google login failed. Please try again.')
   }
 
@@ -86,11 +94,7 @@ function Login()
         />
       </div>
 
-      {googleMessage && (
-        <p className={googleCredential ? 'success-text' : 'danger-text'}>
-          {googleMessage}
-        </p>
-      )}
+      {googleMessage && <p className="danger-text">{googleMessage}</p>}
 
       <p className="mt-4 text-center">
         <Link to="/forgot-password">Forgot Password?</Link>
