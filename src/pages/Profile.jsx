@@ -13,7 +13,14 @@ function Profile() {
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const [badges, setBadges] = useState([]);
+  const [kudosFeed, setKudosFeed] = useState([]);
   const initials = displayUser.name?.trim().slice(0, 1).toUpperCase() || "H";
+  const kudosGiven = kudosFeed.filter(
+    (kudos) => (kudos.sender?._id || kudos.sender?.id) === user?.id,
+  ).length;
+  const kudosReceived = kudosFeed.filter(
+    (kudos) => (kudos.receiver?._id || kudos.receiver?.id) === user?.id,
+  ).length;
 
   useEffect(() => {
     if (!user?.id) return;
@@ -21,7 +28,10 @@ function Profile() {
     api
       .get("/kudos", { params: { limit: 50 } })
       .then((response) => {
-        const receivedValues = response.data.data.kudos
+        const feed = response.data.data.kudos;
+        setKudosFeed(feed);
+
+        const receivedValues = feed
           .filter(
             (kudos) => (kudos.receiver?._id || kudos.receiver?.id) === user.id,
           )
@@ -114,11 +124,11 @@ function Profile() {
         </div>
         <div className="card">
           <h3>Kudos Given</h3>
-          <p>{displayUser.kudosGiven ?? 0}</p>
+          <p>{kudosGiven}</p>
         </div>
         <div className="card">
           <h3>Kudos Received</h3>
-          <p>{displayUser.kudosReceived ?? 0}</p>
+          <p>{kudosReceived}</p>
         </div>
       </section>
 
