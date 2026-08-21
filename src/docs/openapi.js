@@ -1,0 +1,57 @@
+const openapi = {
+  openapi: '3.0.3',
+  info: {
+    title: 'Kudos Platform API',
+    version: '1.0.0',
+    description: 'Internal employee-recognition backend. Protected requests use a Bearer access token; refresh tokens are httpOnly cookies.',
+  },
+  servers: [{ url: 'http://localhost:5000/api/v1', description: 'Local development' }],
+  tags: [
+    { name: 'System' }, { name: 'Authentication' }, { name: 'Users' }, { name: 'Kudos' },
+    { name: 'Reactions' }, { name: 'Leaderboard' }, { name: 'Analytics' }, { name: 'Admin' },
+  ],
+  components: {
+    securitySchemes: { bearerAuth: { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' } },
+    schemas: {
+      Success: { type: 'object', properties: { success: { type: 'boolean', example: true }, message: { type: 'string' }, data: { nullable: true } } },
+      Error: { type: 'object', properties: { success: { type: 'boolean', example: false }, message: { type: 'string', example: 'Invalid or expired access token' } } },
+      SignupInput: { type: 'object', required: ['name', 'email', 'password', 'confirmPassword', 'department'], properties: { name: { type: 'string', example: 'Krishna Kalsariya' }, email: { type: 'string', format: 'email' }, password: { type: 'string', format: 'password', minLength: 8 }, confirmPassword: { type: 'string', format: 'password' }, department: { $ref: '#/components/schemas/Department' }, avatar: { type: 'string', format: 'uri' } } },
+      LoginInput: { type: 'object', required: ['email', 'password'], properties: { email: { type: 'string', format: 'email' }, password: { type: 'string', format: 'password' } } },
+      Department: { type: 'string', enum: ['Engineering', 'Design', 'Marketing', 'Sales'] },
+      CompanyValue: { type: 'string', enum: ['#Teamwork', '#CustomerObsession', '#Innovation'] },
+      ReactionType: { type: 'string', enum: ['+1', '👏', '🔥'] },
+      KudosInput: { type: 'object', required: ['receiverId', 'points', 'message', 'companyValue'], properties: { receiverId: { type: 'string', example: '507f1f77bcf86cd799439011' }, points: { type: 'integer', enum: [10, 20, 50] }, message: { type: 'string', minLength: 3, maxLength: 500 }, companyValue: { $ref: '#/components/schemas/CompanyValue' } } },
+    },
+    responses: {
+      Unauthorized: { description: 'Authentication required', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+      Forbidden: { description: 'Admin role required', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+      ValidationError: { description: 'Invalid request data', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+    },
+  },
+  paths: {
+    '/health': { get: { tags: ['System'], summary: 'Health check', responses: { 200: { description: 'API is healthy', content: { 'application/json': { schema: { $ref: '#/components/schemas/Success' } } } } } } },
+    '/ready': { get: { tags: ['System'], summary: 'Readiness check with database status', responses: { 200: { description: 'API and database are ready' }, 503: { description: 'Database is unavailable' } } } },
+    '/auth/signup': { post: { tags: ['Authentication'], summary: 'Create an employee account', requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/SignupInput' } } } }, responses: { 201: { description: 'Account created; refresh cookie is set', content: { 'application/json': { schema: { $ref: '#/components/schemas/Success' } } } }, 409: { description: 'Email already exists' }, 400: { $ref: '#/components/responses/ValidationError' } } } },
+    '/auth/login': { post: { tags: ['Authentication'], summary: 'Log in and set refresh cookie', requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/LoginInput' } } } }, responses: { 200: { description: 'Access token returned' }, 401: { description: 'Invalid credentials' } } } },
+    '/auth/refresh-token': { post: { tags: ['Authentication'], summary: 'Rotate refresh token', description: 'The browser must send the refreshToken cookie. Use credentials: include from the frontend.', responses: { 200: { description: 'New access token and refresh cookie' }, 401: { $ref: '#/components/responses/Unauthorized' } } } },
+    '/auth/logout': { post: { tags: ['Authentication'], summary: 'Revoke the current refresh session and clear its cookie', responses: { 200: { description: 'Logged out' } } } },
+    '/auth/verify-email': { post: { tags: ['Authentication'], summary: 'Simulate email verification', security: [{ bearerAuth: [] }], responses: { 200: { description: 'Email verified' }, 401: { $ref: '#/components/responses/Unauthorized' } } } },
+    '/auth/forgot-password': { post: { tags: ['Authentication'], summary: 'Request password reset', requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', required: ['email'], properties: { email: { type: 'string', format: 'email' } } } } } }, responses: { 200: { description: 'Generic success response; development includes resetToken' } } } },
+    '/auth/reset-password': { post: { tags: ['Authentication'], summary: 'Reset password using a 10-minute token', requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', required: ['token', 'password', 'confirmPassword'], properties: { token: { type: 'string' }, password: { type: 'string', format: 'password' }, confirmPassword: { type: 'string', format: 'password' } } } } } }, responses: { 200: { description: 'Password reset and new session issued' }, 400: { description: 'Invalid or expired token' } } } },
+    '/users': { get: { tags: ['Users'], summary: 'List employees', security: [{ bearerAuth: [] }], parameters: [{ name: 'department', in: 'query', schema: { $ref: '#/components/schemas/Department' } }, { name: 'search', in: 'query', schema: { type: 'string' } }, { name: 'page', in: 'query', schema: { type: 'integer', minimum: 1 } }, { name: 'limit', in: 'query', schema: { type: 'integer', maximum: 50 } }], responses: { 200: { description: 'Paginated users' }, 401: { $ref: '#/components/responses/Unauthorized' } } } },
+    '/users/me': { get: { tags: ['Users'], summary: 'Get authenticated profile', security: [{ bearerAuth: [] }], responses: { 200: { description: 'Profile' }, 401: { $ref: '#/components/responses/Unauthorized' } } }, patch: { tags: ['Users'], summary: 'Update display name or avatar', security: [{ bearerAuth: [] }], requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', properties: { name: { type: 'string' }, avatar: { type: 'string', format: 'uri', nullable: true } } } } } }, responses: { 200: { description: 'Profile updated' }, 400: { $ref: '#/components/responses/ValidationError' } } } },
+    '/users/{id}': { get: { tags: ['Users'], summary: 'Get employee profile', security: [{ bearerAuth: [] }], parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }], responses: { 200: { description: 'User' }, 404: { description: 'User not found' } } } },
+    '/kudos': { get: { tags: ['Kudos'], summary: 'Get cursor-paginated company feed', security: [{ bearerAuth: [] }], parameters: [{ name: 'cursor', in: 'query', schema: { type: 'string' } }, { name: 'limit', in: 'query', schema: { type: 'integer', maximum: 50 } }, { name: 'companyValue', in: 'query', schema: { $ref: '#/components/schemas/CompanyValue' } }], responses: { 200: { description: 'Feed with pageInfo.nextCursor and reaction summaries' } } }, post: { tags: ['Kudos'], summary: 'Give kudos and transfer points', security: [{ bearerAuth: [] }], requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/KudosInput' } } } }, responses: { 201: { description: 'Kudos sent' }, 400: { description: 'Invalid points, self-kudos, or insufficient allowance' }, 503: { description: 'MongoDB replica set required for transactions' } } } },
+    '/kudos/{id}': { get: { tags: ['Kudos'], summary: 'Get one kudos item', security: [{ bearerAuth: [] }], parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }], responses: { 200: { description: 'Kudos with reaction summary' }, 404: { description: 'Kudos not found' } } } },
+    '/kudos/{id}/reactions': { post: { tags: ['Reactions'], summary: 'Add reaction', security: [{ bearerAuth: [] }], parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }], requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', required: ['type'], properties: { type: { $ref: '#/components/schemas/ReactionType' } } } } } }, responses: { 201: { description: 'Reaction and updated summary' }, 409: { description: 'Duplicate reaction' } } } },
+    '/kudos/{id}/reactions/{type}': { delete: { tags: ['Reactions'], summary: 'Remove current user reaction', security: [{ bearerAuth: [] }], parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }, { name: 'type', in: 'path', required: true, schema: { $ref: '#/components/schemas/ReactionType' } }], responses: { 200: { description: 'Updated reaction summary' }, 404: { description: 'Reaction not found' } } } },
+    '/leaderboard': { get: { tags: ['Leaderboard'], summary: 'Monthly recognition leaderboard', security: [{ bearerAuth: [] }], parameters: [{ name: 'month', in: 'query', schema: { type: 'string', example: '2026-08' } }, { name: 'department', in: 'query', schema: { $ref: '#/components/schemas/Department' } }, { name: 'limit', in: 'query', schema: { type: 'integer' } }], responses: { 200: { description: 'Ranked employees' } } } },
+    '/analytics/overview': { get: { tags: ['Analytics'], summary: 'Monthly company overview', security: [{ bearerAuth: [] }], parameters: [{ name: 'month', in: 'query', schema: { type: 'string' } }], responses: { 200: { description: 'Overview' }, 403: { $ref: '#/components/responses/Forbidden' } } } },
+    '/analytics/departments': { get: { tags: ['Analytics'], summary: 'Recognition received by department', security: [{ bearerAuth: [] }], responses: { 200: { description: 'Department metrics' }, 403: { $ref: '#/components/responses/Forbidden' } } } },
+    '/analytics/company-values': { get: { tags: ['Analytics'], summary: 'Company-value popularity', security: [{ bearerAuth: [] }], responses: { 200: { description: 'Company value metrics' }, 403: { $ref: '#/components/responses/Forbidden' } } } },
+    '/admin/monthly-resets': { post: { tags: ['Admin'], summary: 'Run allowance reset manually', security: [{ bearerAuth: [] }], requestBody: { content: { 'application/json': { schema: { type: 'object', properties: { month: { type: 'string', example: '2026-08' } } } } } }, responses: { 201: { description: 'Reset completed' }, 403: { $ref: '#/components/responses/Forbidden' } } } },
+    '/admin/users/{id}': { patch: { tags: ['Admin'], summary: 'Change an employee role or department', security: [{ bearerAuth: [] }], parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }], requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', properties: { department: { $ref: '#/components/schemas/Department' }, role: { type: 'string', enum: ['employee', 'admin'] } } } } } }, responses: { 200: { description: 'User updated' }, 403: { $ref: '#/components/responses/Forbidden' } } } },
+  },
+};
+
+module.exports = openapi;

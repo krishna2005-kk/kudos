@@ -1,0 +1,76 @@
+{
+  "info": {
+    "name": "Peer Kudos API",
+    "description": "Local API smoke tests. Signup and login scripts save accessToken and receiverId as collection variables.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000/api/v1" },
+    { "key": "accessToken", "value": "" },
+    { "key": "receiverId", "value": "" },
+    { "key": "senderEmail", "value": "sender.postman@example.test" },
+    { "key": "receiverEmail", "value": "receiver.postman@example.test" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "request": { "method": "GET", "url": "{{baseUrl}}/health" },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('API is healthy', () => pm.response.to.have.status(200));"] } }]
+    },
+    {
+      "name": "Sign up sender",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"name\": \"Postman Sender\",\n  \"email\": \"{{senderEmail}}\",\n  \"password\": \"Password123!\",\n  \"confirmPassword\": \"Password123!\",\n  \"department\": \"Engineering\"\n}" },
+        "url": "{{baseUrl}}/auth/signup"
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('Account was created', () => pm.expect(pm.response.code).to.be.oneOf([201, 409]));", "if (pm.response.code === 201) pm.collectionVariables.set('accessToken', pm.response.json().data.accessToken);"] } }]
+    },
+    {
+      "name": "Sign up receiver",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"name\": \"Postman Receiver\",\n  \"email\": \"{{receiverEmail}}\",\n  \"password\": \"Password123!\",\n  \"confirmPassword\": \"Password123!\",\n  \"department\": \"Design\"\n}" },
+        "url": "{{baseUrl}}/auth/signup"
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('Receiver was created', () => pm.expect(pm.response.code).to.be.oneOf([201, 409]));", "if (pm.response.code === 201) pm.collectionVariables.set('receiverId', pm.response.json().data.user.id);"] } }]
+    },
+    {
+      "name": "Log in sender",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{senderEmail}}\",\n  \"password\": \"Password123!\"\n}" },
+        "url": "{{baseUrl}}/auth/login"
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('Login succeeds', () => pm.response.to.have.status(200));", "pm.collectionVariables.set('accessToken', pm.response.json().data.accessToken);"] } }]
+    },
+    {
+      "name": "Refresh access token",
+      "request": { "method": "POST", "url": "{{baseUrl}}/auth/refresh-token" },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('Token rotates', () => pm.response.to.have.status(200));", "pm.collectionVariables.set('accessToken', pm.response.json().data.accessToken);"] } }]
+    },
+    {
+      "name": "Give kudos",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"receiverId\": \"{{receiverId}}\",\n  \"points\": 20,\n  \"message\": \"Excellent collaboration on the API tests!\",\n  \"companyValue\": \"#Teamwork\"\n}" },
+        "url": "{{baseUrl}}/kudos"
+      },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('Kudos is created', () => pm.response.to.have.status(201));"] } }]
+    },
+    {
+      "name": "Get feed",
+      "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }], "url": "{{baseUrl}}/kudos?limit=20" },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('Feed returns', () => pm.response.to.have.status(200));"] } }]
+    },
+    {
+      "name": "Leaderboard",
+      "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }], "url": "{{baseUrl}}/leaderboard?limit=10" },
+      "event": [{ "listen": "test", "script": { "exec": ["pm.test('Leaderboard returns', () => pm.response.to.have.status(200));"] } }]
+    }
+  ]
+}
